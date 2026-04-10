@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.so
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+test.db
+
+# Node
+node_modules/
+dist/
+.cache/
+
+# 환경변수 (절대 커밋 금지)
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Docker
+*.log
+.dockerignore
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 비밀 키
+*.pem
+*.key
+*.p12
