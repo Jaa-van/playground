@@ -28,13 +28,15 @@ docker compose up --build
 | Backend API | http://localhost/api/v1 |
 | Backend 직접 | http://localhost:8000 |
 | API 문서 (Swagger) | http://localhost:8000/docs |
-| pgAdmin | http://localhost:5050 |
 
-## pgAdmin 로그인
+## SQLite DB 파일 위치
 
-- Email: `admin@admin.com`
-- Password: `admin`
-- DB 서버 연결: Host=`db`, Port=`5432`, DB=`myapp_db`
+DB 파일은 Docker 볼륨(`sqlite_data`)에 저장됩니다.
+백업이 필요하면:
+
+```bash
+docker compose cp backend:/app/data/app.db ./app.db.backup
+```
 
 ## 자주 쓰는 명령어
 
@@ -52,7 +54,7 @@ docker compose up --build backend
 # 전체 종료
 docker compose down
 
-# DB 포함 전체 삭제 (주의: 데이터 삭제)
+# DB 볼륨 포함 전체 삭제 (주의: 데이터 삭제)
 docker compose down -v
 ```
 
@@ -93,14 +95,6 @@ docker compose exec backend pytest --cov=app --cov-report=term-missing
 ```bash
 # 80 포트 사용 중인 프로세스 확인 (Windows)
 netstat -ano | findstr :80
-```
-
-### DB 연결 실패
-
-```bash
-# DB 컨테이너 상태 확인
-docker compose ps db
-docker compose logs db
 ```
 
 ### 패키지 추가 후 반영 안 됨
