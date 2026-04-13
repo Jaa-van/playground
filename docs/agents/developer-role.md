@@ -7,6 +7,18 @@ SPEC에 없는 기능을 추가하거나, 테스트를 생략하거나, 보안 �
 
 ## 세션 시작 전 필독
 
+**Step 1 — 최근 작업 이력 파악 (git log 먼저 실행)**
+
+```bash
+# develop 최근 이력 — 어떤 SPEC이 진행 중인지 파악
+git log develop --oneline --decorate -15
+
+# REQUEST_CHANGES 재작업 시: 이전 사이클 커밋 확인
+git log develop..HEAD --oneline
+```
+
+**Step 2 — 문서 확인**
+
 ```
 # Backend 작업 시
 docs/architecture/backend-layers.md
@@ -24,11 +36,12 @@ docs/frontend/api-integration.md
 ## 작업 순서
 
 1. SPEC 파일 읽기
-2. feature 브랜치 생성: `git checkout -b feature/SPEC-NNN-<name> develop`
-3. 구현 (Backend → Frontend 순서 권장)
-4. 테스트 작성 및 통과 확인
-5. 커밋 (Conventional Commits 형식)
-6. PR 생성
+2. (있을 경우) `docs/feedback/DEVNOTES-NNN-*.md` 직전 관련 노트 확인
+3. feature 브랜치 생성: `git checkout -b feature/SPEC-NNN-<name> develop`
+4. 구현 (Backend → Frontend 순서 권장)
+5. 테스트 작성 및 통과 확인
+6. 커밋 (Conventional Commits 형식)
+7. PR 생성
 
 ## 코드 작성 규칙
 
@@ -57,6 +70,21 @@ docs/frontend/api-integration.md
 [ ] 새 의존성 추가 시 requirements.txt / package.json 업데이트
 ```
 
+## 세션 종료 전: CLAUDE.md 현황 업데이트
+
+PR 생성 후 `CLAUDE.md`의 `## 현재 작업 현황` 섹션을 업데이트합니다.
+
+```
+> **업데이트**: YYYY-MM-DD (by Developer)
+> **단계**: SPEC-NNN 리뷰 대기
+> **진행 SPEC**: SPEC-NNN — [기능명]
+> **브랜치 / PR**: feature/SPEC-NNN-<name> / PR #NNN
+> **다음 필요 액션**: **평가자** → PR #NNN 리뷰
+> **주의사항**: [재작업이면 "[REVIEW-N]" 몇 번째 사이클인지 기재, 없으면 "-"]
+```
+
+커밋 메시지: `docs: update CLAUDE.md status (SPEC-NNN 리뷰 대기)`
+
 ## 브랜치 & PR 규칙
 
 ```bash
@@ -74,6 +102,38 @@ gh pr create \
 ```
 
 PR 제목에 반드시 `[REVIEW]` 포함 — 평가자 agent가 이 태그로 리뷰 대상 PR을 식별합니다.
+
+## PR 머지 후: DEVNOTES 작성
+
+PR이 APPROVE되어 develop에 머지되면, 아래 파일을 생성하고 develop에 커밋합니다:
+
+`docs/feedback/DEVNOTES-NNN-<name>.md`
+
+```markdown
+# DEVNOTES-NNN: [기능명]
+
+## 관련 SPEC
+docs/specs/SPEC-NNN-<name>.md
+
+## SPEC 구현 중 발견한 이슈
+
+### 이슈 1: [제목]
+- SPEC 위치: [어느 섹션/AC]
+- 문제: [무엇이 불명확했거나 누락됐는지]
+- 실제 구현 결정: [어떻게 판단해서 구현했는지]
+- 향후 SPEC 개선 제안: [기획자에게 제안할 내용]
+
+## 메타데이터
+- 작성자: Developer
+- 날짜: YYYY-MM-DD
+```
+
+> 이슈가 없을 경우: 이슈 섹션 삭제 후 "SPEC 품질 이슈 없음." 한 줄만 기재. 파일은 반드시 생성합니다.
+
+커밋 메시지:
+```
+docs(feedback): add DEVNOTES-NNN <기능명>
+```
 
 ## 테스트 작성 기준
 

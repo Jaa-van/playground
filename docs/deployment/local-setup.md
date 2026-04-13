@@ -58,17 +58,17 @@ docker compose down
 docker compose down -v
 ```
 
-## DB 마이그레이션
+## DB 테이블 관리
+
+SQLite를 사용하며, 앱 시작 시 `Base.metadata.create_all()`이 자동으로 테이블을 생성합니다.
+별도의 마이그레이션 실행이 필요 없습니다.
 
 ```bash
-# 마이그레이션 실행
-docker compose exec backend alembic upgrade head
+# DB 파일 위치 확인
+docker compose exec backend ls -la /app/data/
 
-# 새 마이그레이션 생성
-docker compose exec backend alembic revision --autogenerate -m "add_users_table"
-
-# 마이그레이션 롤백
-docker compose exec backend alembic downgrade -1
+# DB 파일 백업
+docker compose cp backend:/app/data/app.db ./app.db.backup
 ```
 
 ## 테스트 실행

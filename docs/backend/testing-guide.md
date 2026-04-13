@@ -21,8 +21,8 @@ from sqlalchemy.orm import sessionmaker
 from app.main import app
 from app.core.database import Base, get_db
 
-# 테스트용 인메모리 SQLite DB
-SQLALCHEMY_TEST_URL = "sqlite:///./test.db"
+# 테스트용 인메모리 SQLite DB (파일 미생성, 테스트 간 완전 격리)
+SQLALCHEMY_TEST_URL = "sqlite:///:memory:"
 
 engine = create_engine(SQLALCHEMY_TEST_URL, connect_args={"check_same_thread": False})
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

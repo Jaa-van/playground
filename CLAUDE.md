@@ -3,7 +3,7 @@
 ## Stack
 - **Backend**: Python 3.12 + FastAPI → [docs/backend/api-conventions.md](docs/backend/api-conventions.md)
 - **Frontend**: JavaScript + React 18 (Vite) → [docs/frontend/component-conventions.md](docs/frontend/component-conventions.md)
-- **DB**: PostgreSQL 16 (SQLAlchemy ORM + Alembic 마이그레이션)
+- **DB**: SQLite (SQLAlchemy ORM, 앱 시작 시 `create_all` 자동 생성)
 - **Infra**: Docker Compose (로컬), AWS EC2 (운영)
 
 ## Agent 역할별 필독 파일
@@ -37,6 +37,17 @@
 - 커밋 형식: Conventional Commits → [docs/git/commit-conventions.md](docs/git/commit-conventions.md)
 - 전체 전략: [docs/git/branching-strategy.md](docs/git/branching-strategy.md)
 
+## 현재 작업 현황
+
+> **업데이트**: -  
+> **단계**: 초기 설정 완료, 첫 SPEC 대기 중  
+> **진행 SPEC**: -  
+> **브랜치 / PR**: -  
+> **다음 필요 액션**: **기획자** → 첫 번째 SPEC 작성 (SPEC-001)  
+> **주의사항**: -
+
+---
+
 ## Handoff 프로토콜 (요약)
 
 ```
@@ -55,7 +66,7 @@ cd infrastructure
 docker compose up --build   # 전체 스택 실행
 # http://localhost      → Frontend
 # http://localhost/api  → Backend API
-# http://localhost:5050 → pgAdmin (개발용)
+# http://localhost:8000/docs → Swagger UI
 ```
 
 → 상세: [docs/deployment/local-setup.md](docs/deployment/local-setup.md)

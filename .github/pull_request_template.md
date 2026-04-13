@@ -1,3 +1,6 @@
+> **PR 제목에 반드시 `[REVIEW]` 포함** — 평가자 agent가 이 태그로 리뷰 대상 PR을 식별합니다.
+> 예시: `feat(backend): SPEC-001 user auth [REVIEW]`
+
 ## 관련 SPEC
 
 - SPEC-NNN: [기능명](../docs/specs/SPEC-NNN-<name>.md)
