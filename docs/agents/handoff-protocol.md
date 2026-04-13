@@ -10,12 +10,27 @@ Agent 간 인수인계는 **파일 기반**으로 동작합니다. 세션 체이
 사용자 요구사항
       ↓
 [기획자 session]
-      ↓ docs/specs/SPEC-NNN-<name>.md 생성 + 커밋
+  ① docs/feedback/LESSONS.md 확인 (최근 5개)
+  ② docs/feedback/FEEDBACK-NNN-*.md 확인 (REJECT 수신 시)
+  ③ docs/feedback/DEVNOTES-NNN-*.md 확인 (직전 사이클)
+      ↓ docs/specs/SPEC-NNN-<name>.md 생성 + LESSONS.md 업데이트 + develop 커밋
 [개발자 session]
       ↓ feature/SPEC-NNN-<name> 브랜치 → PR 오픈 ([REVIEW] 태그)
 [평가자 session]
-      ↓ docs/reviews/REVIEW-NNN-<name>.md 생성 + PR APPROVE/REQUEST_CHANGES
-[머지 → develop]
+      ↓
+  ┌── APPROVE ─────────────────────────────────────────────┐
+  │   PR merge to develop                                  │
+  │   개발자: DEVNOTES-NNN 생성 + develop 커밋              │
+  └────────────────────────────────────────────────────────┘
+  ┌── REQUEST_CHANGES ─────────────────────────────────────┐
+  │   REVIEW 파일 커밋 → 개발자 재작업 → [REVIEW-2] 재태그  │
+  │   (최대 3회, 이후 REJECT 경로)                          │
+  └────────────────────────────────────────────────────────┘
+  ┌── REJECT ──────────────────────────────────────────────┐
+  │   FEEDBACK-NNN 생성 + develop 직접 커밋                 │
+  │   PR 닫기                                              │
+  │   기획자: 다음 세션에서 FEEDBACK 읽고 SPEC 재설계        │
+  └────────────────────────────────────────────────────────┘
       ↓
 [다음 SPEC으로 반복]
 ```
@@ -54,7 +69,26 @@ Agent 간 인수인계는 **파일 기반**으로 동작합니다. 세션 체이
 | 커밋 메시지 | `docs(reviews): add REVIEW-NNN <기능명>` |
 | APPROVE 시 | PR merge to `develop` 실행 |
 | REQUEST_CHANGES 시 | REVIEW 파일 커밋 후 개발자에게 재작업 요청 |
-| REJECT 시 | PR 닫기, 기획자에게 SPEC 재검토 요청 |
+| REJECT 시 | FEEDBACK 파일 생성 + PR 닫기, 기획자에게 SPEC 재검토 요청 |
+
+### 평가자 → 기획자 (REJECT 시)
+
+| 항목 | 규칙 |
+|------|------|
+| 파일 위치 | `docs/feedback/FEEDBACK-NNN-<kebab-name>.md` |
+| 브랜치 | `develop`에 직접 커밋 |
+| 커밋 메시지 | `docs(feedback): add FEEDBACK-NNN <기능명>` |
+| 완료 신호 | develop에 FEEDBACK 파일 존재 + PR 닫힘 |
+
+### 개발자 → 기획자 (머지 후)
+
+| 항목 | 규칙 |
+|------|------|
+| 파일 위치 | `docs/feedback/DEVNOTES-NNN-<kebab-name>.md` |
+| 브랜치 | `develop`에 직접 커밋 |
+| 커밋 메시지 | `docs(feedback): add DEVNOTES-NNN <기능명>` |
+| 완료 신호 | develop에 DEVNOTES 파일 존재 |
+| 이슈 없을 때 | 파일 생성 후 "SPEC 품질 이슈 없음." 한 줄만 기재 |
 
 ## 파일 네이밍 규칙
 
@@ -83,15 +117,67 @@ PR 제목에 [REVIEW] 재태그 (예: "[REVIEW-2]")
 
 최대 3회 REQUEST_CHANGES 후에도 해결 안 되면 REJECT → SPEC 재검토.
 
+## 최근 작업 이력 파악 (git log)
+
+각 agent는 세션 시작 시 아래 명령으로 최근 작업 흐름을 파악합니다.
+commit message는 Conventional Commits 형식이므로 `feat/fix/docs` 접두사로 어떤 작업이 있었는지 빠르게 파악할 수 있습니다.
+
+### 공통: develop 브랜치 최근 이력
+
+```bash
+git log develop --oneline --decorate -20
+```
+
+출력 해석 기준:
+- `docs(specs): add SPEC-NNN` — 기획 완료, 개발 대기 중
+- `feat(...)` — 구현 커밋
+- `docs(reviews): add REVIEW-NNN` — 리뷰 완료
+- `docs(feedback): add FEEDBACK-NNN` — REJECT 발생, 기획자 재작업 필요
+- `docs(feedback): add DEVNOTES-NNN` — 머지 완료, 개발자 노트 있음
+
+### 기획자 전용
+
+```bash
+# 최신 SPEC 번호 확인 (다음 번호 결정)
+git log develop --oneline --grep="docs(specs)" -5
+
+# 최근 REJECT 이력 확인
+git log develop --oneline --grep="FEEDBACK" -5
+```
+
+### 개발자 전용
+
+```bash
+# 작업 중인 feature 브랜치에서 develop 대비 내 커밋 목록
+git log develop..HEAD --oneline
+
+# REQUEST_CHANGES 이후 재작업 시: 어떤 리뷰가 있었는지
+git log --oneline --grep="REVIEW-NNN" --all
+```
+
+### 평가자 전용
+
+```bash
+# PR 브랜치의 커밋 목록 (구현 의도 파악)
+git log develop..<feature-branch> --oneline
+
+# 동일 SPEC의 이전 리뷰 사이클 여부 확인
+git log --oneline --all --grep="SPEC-NNN"
+```
+
 ## 현재 작업 현황 확인
 
 ```bash
-# 미리뷰 대기 중인 PR 목록
-gh pr list --label "[REVIEW]" --base develop
+# 리뷰 대기 중인 PR 목록
+gh pr list --base develop
 
-# 최신 SPEC 번호 확인
+# 최신 SPEC/REVIEW 번호 확인
 ls docs/specs/
-
-# 최신 REVIEW 번호 확인
 ls docs/reviews/
+
+# 미처리 피드백 확인
+ls docs/feedback/
+
+# 최신 교훈 확인
+head -50 docs/feedback/LESSONS.md
 ```
