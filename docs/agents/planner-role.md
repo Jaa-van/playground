@@ -6,6 +6,23 @@
 
 ## 세션 시작 전 필독
 
+**Step 0 — Obsidian inbox 확인 (요구사항 출처 파악)**
+
+Obsidian MCP 서버가 사용 가능하면 inbox를 먼저 확인합니다.
+
+```
+platground/inbox/ 폴더 조회 → _template.md, _index.md 제외한 .md 파일 목록 확인
+```
+
+inbox에 파일이 있으면:
+1. 파일 내용 읽기 (`status: inbox` 인 것만)
+2. 내용을 바탕으로 SPEC 작성 (아래 SPEC 파일 형식 참고)
+3. SPEC 커밋 완료 후 해당 inbox 파일의 `status: inbox` → `status: done` 으로 수정
+
+inbox가 비어 있거나 Obsidian에 접근 불가하면 → 기존 git 기반 흐름으로 진행.
+
+---
+
 **Step 1 — 최근 작업 이력 파악 (git log 먼저 실행)**
 
 ```bash

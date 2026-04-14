@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# .githooks/post-commit
+# docs/ 하위 파일이 커밋되면 Obsidian에 자동 동기화
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+SYNC_SCRIPT="$REPO_ROOT/scripts/obsidian-sync.sh"
+
+[ -x "$SYNC_SCRIPT" ] || exit 0
+
+# 마지막 커밋에서 변경된 파일 수집
+CHANGED=()
+while IFS= read -r line; do
+    case "$line" in
+        docs/specs/SPEC-*.md)     CHANGED+=("$line") ;;
+        docs/reviews/REVIEW-*.md) CHANGED+=("$line") ;;
+        docs/feedback/*.md)       CHANGED+=("$line") ;;
+        CLAUDE.md)                CHANGED+=("$line") ;;
+    esac
+done <<< "$(git diff-tree --no-commit-id -r --name-only HEAD)"
+
+[ ${#CHANGED[@]} -eq 0 ] && exit 0
+
+printf "📎 Obsidian 동기화 중...\n"
+"$SYNC_SCRIPT" "${CHANGED[@]}"
