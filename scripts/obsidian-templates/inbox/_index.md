@@ -22,4 +22,4 @@
 | (없음) | | |
 
 ---
-[[platground/inbox/_template|+ 새 기획 메모 작성 (템플릿 복사)]]
+[[harness-template/inbox/_template|+ 새 기획 메모 작성 (템플릿 복사)]]

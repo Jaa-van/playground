@@ -10,7 +10,7 @@
 
 ## 누적 교훈
 
-[[platground/feedback/LESSONS|LESSONS.md 보기]]
+[[harness-template/feedback/LESSONS|LESSONS.md 보기]]
 
 ---
 > 자동 생성: git post-commit hook

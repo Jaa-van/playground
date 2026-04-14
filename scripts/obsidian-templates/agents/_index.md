@@ -6,9 +6,9 @@
 
 | 역할 | 문서 | 핵심 책임 |
 |------|------|-----------|
-| 기획자 (Planner) | [[platground/agents/planner\|Planner 역할]] | SPEC 작성, LESSONS 확인 |
-| 개발자 (Developer) | [[platground/agents/developer\|Developer 역할]] | SPEC 기반 구현, PR 오픈 |
-| 평가자 (Evaluator) | [[platground/agents/evaluator\|Evaluator 역할]] | 코드 리뷰, APPROVE/REJECT 결정 |
+| 기획자 (Planner) | [[harness-template/agents/planner\|Planner 역할]] | SPEC 작성, LESSONS 확인 |
+| 개발자 (Developer) | [[harness-template/agents/developer\|Developer 역할]] | SPEC 기반 구현, PR 오픈 |
+| 평가자 (Evaluator) | [[harness-template/agents/evaluator\|Evaluator 역할]] | 코드 리뷰, APPROVE/REJECT 결정 |
 
 ## 워크플로우
 

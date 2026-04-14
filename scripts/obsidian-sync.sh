@@ -8,7 +8,7 @@
 # 필요 환경변수 (.env 또는 shell):
 #   OBSIDIAN_API_KEY  — Obsidian Local REST API 키 (필수)
 #   OBSIDIAN_HOST     — Obsidian 호스트 (기본값: https://127.0.0.1:27124)
-#   OBSIDIAN_VAULT    — vault 내 폴더명 (기본값: platground)
+#   OBSIDIAN_VAULT    — vault 내 폴더명 (기본값: harness-template)
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 
@@ -21,7 +21,7 @@ if [ -f "$REPO_ROOT/.env" ]; then
 fi
 
 HOST="${OBSIDIAN_HOST:-https://127.0.0.1:27124}"
-VAULT="${OBSIDIAN_VAULT:-platground}"
+VAULT="${OBSIDIAN_VAULT:-harness-template}"
 
 if [ -z "${OBSIDIAN_API_KEY:-}" ]; then
     echo "⚠️  OBSIDIAN_API_KEY 환경변수가 설정되지 않았습니다. .env를 확인하세요." >&2
@@ -136,7 +136,7 @@ regen_specs_index() {
             title=$(spec_title "$f")
             date=$(file_date "docs/specs/$(basename "$f")")
             status=$(spec_review_status "$num")
-            printf "| [[platground/specs/SPEC-%s-%s|SPEC-%s]] | %s | %s | %s |\n" \
+            printf "| [[harness-template/specs/SPEC-%s-%s|SPEC-%s]] | %s | %s | %s |\n" \
                 "$num" "$slug" "$num" "$title" "$status" "$date"
         done
 
@@ -163,7 +163,7 @@ regen_reviews_index() {
             decision=$(review_decision "$f")
             score=$(review_score "$f")
             date=$(file_date "docs/reviews/$(basename "$f")")
-            printf "| [[platground/reviews/REVIEW-%s-%s|REVIEW-%s]] | %s | %s | %s | %s |\n" \
+            printf "| [[harness-template/reviews/REVIEW-%s-%s|REVIEW-%s]] | %s | %s | %s | %s |\n" \
                 "$num" "$slug" "$num" "$slug" "$(decision_label "$decision")" "$score" "$date"
         done
 
@@ -189,7 +189,7 @@ regen_feedback_index() {
             bname=$(basename "$f" .md)
             num=$(extract_num "$f")
             date=$(file_date "docs/feedback/$(basename "$f")")
-            printf '%s\n' "- [[platground/feedback/$bname|$bname]] — SPEC-$num ($date)"
+            printf '%s\n' "- [[harness-template/feedback/$bname|$bname]] — SPEC-$num ($date)"
         done
         [ $has_fb -eq 0 ] && printf "*(없음)*\n"
 
@@ -202,12 +202,12 @@ regen_feedback_index() {
             bname=$(basename "$f" .md)
             num=$(extract_num "$f")
             date=$(file_date "docs/feedback/$(basename "$f")")
-            printf '%s\n' "- [[platground/feedback/$bname|$bname]] — SPEC-$num ($date)"
+            printf '%s\n' "- [[harness-template/feedback/$bname|$bname]] — SPEC-$num ($date)"
         done
         [ $has_dn -eq 0 ] && printf "*(없음)*\n"
 
         printf "\n## 누적 교훈\n\n"
-        printf "[[platground/feedback/LESSONS|LESSONS.md 보기]]\n"
+        printf "[[harness-template/feedback/LESSONS|LESSONS.md 보기]]\n"
 
         printf "\n---\n> 자동 생성: git post-commit hook\n"
     } > "$tmp"
@@ -237,7 +237,7 @@ regen_root_index() {
     fb_cnt=$(find "$REPO_ROOT/docs/feedback" \( -name "FEEDBACK-*.md" -o -name "DEVNOTES-*.md" \) 2>/dev/null | wc -l | tr -d ' ')
 
     {
-        printf "# platground — 프로젝트 허브\n\n"
+        printf "# harness-template — 프로젝트 허브\n\n"
         printf "> 마지막 동기화: %s\n\n" "$updated"
 
         printf "## 현재 상태\n\n"
@@ -254,12 +254,12 @@ regen_root_index() {
         printf "| FEEDBACK / DEVNOTES | %s |\n" "$fb_cnt"
 
         printf "\n## 빠른 링크\n\n"
-        echo "- [[platground/overview|프로젝트 설계 개요]]"
-        echo "- [[platground/specs/_index|SPEC 목록 →]]"
-        echo "- [[platground/reviews/_index|REVIEW 이력 →]]"
-        echo "- [[platground/feedback/_index|피드백 & 노트 →]]"
-        echo "- [[platground/architecture/_index|아키텍처]]"
-        echo "- [[platground/agents/_index|Agent 역할]]"
+        echo "- [[harness-template/overview|프로젝트 설계 개요]]"
+        echo "- [[harness-template/specs/_index|SPEC 목록 →]]"
+        echo "- [[harness-template/reviews/_index|REVIEW 이력 →]]"
+        echo "- [[harness-template/feedback/_index|피드백 & 노트 →]]"
+        echo "- [[harness-template/architecture/_index|아키텍처]]"
+        echo "- [[harness-template/agents/_index|Agent 역할]]"
 
         printf "\n---\n"
         printf "*이 노트는 git post-commit hook이 자동으로 갱신합니다.*\n"
