@@ -4,11 +4,31 @@
 # 사용법:
 #   scripts/obsidian-sync.sh                           # 전체 동기화
 #   scripts/obsidian-sync.sh docs/specs/SPEC-001-foo.md  # 특정 파일만
+#
+# 필요 환경변수 (.env 또는 shell):
+#   OBSIDIAN_API_KEY  — Obsidian Local REST API 키 (필수)
+#   OBSIDIAN_HOST     — Obsidian 호스트 (기본값: https://127.0.0.1:27124)
+#   OBSIDIAN_VAULT    — vault 내 폴더명 (기본값: platground)
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
-HOST="https://127.0.0.1:27124"
-TOKEN="a8165c0c9fb2d22f9bd709aab8f6350d2370e16ba6470ee54c204acbb0363863"
-VAULT="platground"
+
+# .env 로드 (있을 경우)
+if [ -f "$REPO_ROOT/.env" ]; then
+    set -a
+    # shellcheck disable=SC1091
+    source "$REPO_ROOT/.env"
+    set +a
+fi
+
+HOST="${OBSIDIAN_HOST:-https://127.0.0.1:27124}"
+VAULT="${OBSIDIAN_VAULT:-platground}"
+
+if [ -z "${OBSIDIAN_API_KEY:-}" ]; then
+    echo "⚠️  OBSIDIAN_API_KEY 환경변수가 설정되지 않았습니다. .env를 확인하세요." >&2
+    exit 0  # Obsidian 미설정 환경에서는 조용히 종료
+fi
+
+TOKEN="$OBSIDIAN_API_KEY"
 
 # ── 유틸리티 ──────────────────────────────────────────────────────────────
 
