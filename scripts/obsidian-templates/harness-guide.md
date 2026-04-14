@@ -1,4 +1,4 @@
-# platground 하네스 — 완전 설명서
+# harness-template 하네스 — 완전 설명서
 
 > 작성일: 2026-04-14 | 대상: 이 프로젝트를 처음 보는 나 (또는 Claude)
 
@@ -6,7 +6,7 @@
 
 ## 1. 이 하네스란?
 
-**platground**는 Claude Code의 Multi-Agent 시스템을 활용한 1인 풀스택 개발 환경입니다.
+**harness-template**는 Claude Code의 Multi-Agent 시스템을 활용한 1인 풀스택 개발 환경입니다.
 
 기능 하나를 만들 때 세 역할(기획자 → 개발자 → 평가자)을 각각의 Claude 세션이 맡아 수행합니다.  
 각 세션은 이전 세션의 컨텍스트 없이 **파일만 보고 작업을 이어받습니다.**
@@ -68,7 +68,7 @@ nginx (Reverse Proxy)
 ## 4. 프로젝트 디렉토리 구조
 
 ```
-platground/
+harness-template/
 ├── backend/
 │   └── app/
 │       ├── api/          ← FastAPI 라우터
@@ -180,14 +180,14 @@ Obsidian이 꺼져 있으면 조용히 스킵됩니다.
 
 ### 역방향 — Obsidian에서 기획하기
 
-1. `platground/inbox/` 폴더에서 `_template.md` 복사
+1. `harness-template/inbox/` 폴더에서 `_template.md` 복사
 2. 새 파일(`기능명.md`)로 기획 내용 작성
 3. 기획자 세션 시작 → 자동으로 inbox 확인 후 SPEC 생성
 
 ### Obsidian 폴더 구조
 
 ```
-platground/ (Obsidian vault)
+harness-template/ (Obsidian vault)
 ├── _index.md      ← 현황판 (자동 갱신)
 ├── overview.md    ← 프로젝트 설계 개요
 ├── inbox/         ← 기획 메모 작성 공간
@@ -290,7 +290,7 @@ docker compose down               # 종료
 
 ---
 
-*이 문서는 [[platground/overview|하네스 설계 개요]]와 함께 읽으면 좋습니다.*
+*이 문서는 [[harness-template/overview|하네스 설계 개요]]와 함께 읽으면 좋습니다.*
 ---
 
 ## 11. 새로운 팀원 온보딩 (Clone 후 설정)
@@ -318,7 +318,7 @@ cp .env.example .env
 | `SECRET_KEY` | 랜덤 32자 문자열로 변경 |
 | `OBSIDIAN_API_KEY` | Obsidian → Settings → Community Plugins → Local REST API 에서 복사 |
 | `OBSIDIAN_HOST` | 기본값 유지 (`https://127.0.0.1:27124`) |
-| `OBSIDIAN_VAULT` | 기본값 유지 (`platground`) |
+| `OBSIDIAN_VAULT` | 기본값 유지 (`harness-template`) |
 
 Obsidian을 사용하지 않는다면 `OBSIDIAN_API_KEY`는 비워도 됩니다.
 

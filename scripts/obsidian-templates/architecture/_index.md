@@ -6,9 +6,9 @@
 
 | 문서 | 설명 |
 |------|------|
-| [[platground/architecture/overview\|전체 시스템 구조]] | 레이어별 역할과 전체 흐름 |
-| [[platground/architecture/backend-layers\|Backend 계층 패턴]] | API / Service / Repository 패턴 |
-| [[platground/architecture/frontend-structure\|Frontend 컴포넌트 구조]] | 페이지 / 컴포넌트 / 훅 구성 |
+| [[harness-template/architecture/overview\|전체 시스템 구조]] | 레이어별 역할과 전체 흐름 |
+| [[harness-template/architecture/backend-layers\|Backend 계층 패턴]] | API / Service / Repository 패턴 |
+| [[harness-template/architecture/frontend-structure\|Frontend 컴포넌트 구조]] | 페이지 / 컴포넌트 / 훅 구성 |
 
 ## 시스템 개요
 

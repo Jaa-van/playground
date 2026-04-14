@@ -11,7 +11,7 @@
 Obsidian MCP 서버가 사용 가능하면 inbox를 먼저 확인합니다.
 
 ```
-platground/inbox/ 폴더 조회 → _template.md, _index.md 제외한 .md 파일 목록 확인
+harness-template/inbox/ 폴더 조회 → _template.md, _index.md 제외한 .md 파일 목록 확인
 ```
 
 inbox에 파일이 있으면:

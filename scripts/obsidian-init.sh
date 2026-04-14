@@ -26,7 +26,7 @@ if [ -f "$REPO_ROOT/.env" ]; then
 fi
 
 HOST="${OBSIDIAN_HOST:-https://127.0.0.1:27124}"
-VAULT="${OBSIDIAN_VAULT:-platground}"
+VAULT="${OBSIDIAN_VAULT:-harness-template}"
 TOKEN="${OBSIDIAN_API_KEY:-}"
 
 # ── 유틸리티 ──────────────────────────────────────────────────────────────

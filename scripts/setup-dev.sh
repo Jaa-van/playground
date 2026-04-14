@@ -8,7 +8,7 @@ set -e
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 
-echo "🔧 platground 개발 환경 설정 중..."
+echo "🔧 harness-template 개발 환경 설정 중..."
 
 # ── 1. git hook 설치 ──────────────────────────────────────────────────────
 HOOK_SRC="$REPO_ROOT/.githooks/post-commit"
