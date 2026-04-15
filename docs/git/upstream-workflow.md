@@ -52,11 +52,29 @@ git checkout harness/main -- docs/backend/api-conventions.md
 
 ## 개선사항을 harness-template에 PR 보내기
 
-### 1. HARNESS_FEEDBACK.md 정리
+### 자동 방법 (권장)
+
+`contribute-to-harness.sh` 스크립트가 클론, 브랜치 생성, 파일 복사, push, PR 생성을 자동으로 수행합니다.
+
+```bash
+# 기여 내용 확인 (실제 PR 생성 안 함)
+bash scripts/contribute-to-harness.sh --dry-run
+
+# PR 생성
+bash scripts/contribute-to-harness.sh
+```
+
+포함되는 파일:
+- `HARNESS_FEEDBACK.md` — 체크박스 항목이 있을 때만
+- `docs/lessons/LESSON-NNN-*.md` — 존재하는 경우 자동 포함
+
+### 수동 방법 (자동화 불가 시)
+
+#### 1. HARNESS_FEEDBACK.md 정리
 
 프로젝트 마무리 시 `HARNESS_FEEDBACK.md`의 "Template 수정 제안" 섹션을 검토합니다.
 
-### 2. Lesson 파일 작성
+#### 2. Lesson 파일 작성
 
 `docs/lessons/` 디렉토리의 템플릿을 복사해 작성합니다:
 
@@ -64,12 +82,12 @@ git checkout harness/main -- docs/backend/api-conventions.md
 cp docs/lessons/LESSON-TEMPLATE.md docs/lessons/LESSON-NNN-<slug>.md
 ```
 
-### 3. harness-template worktree에서 작업
+#### 3. harness-template에서 직접 작업
 
 ```bash
 # harness-template 로컬 클론이 있는 경우
 cd ~/harness-template
-git checkout -b lessons/from-my-project
+git checkout -b contrib/from-my-project
 
 # Lesson 파일 복사
 cp ~/my-project/docs/lessons/LESSON-NNN-*.md docs/lessons/
@@ -78,8 +96,8 @@ cp ~/my-project/docs/lessons/LESSON-NNN-*.md docs/lessons/
 # ...
 
 git add docs/lessons/ docs/backend/
-git commit -m "docs(lessons): add LESSON-NNN <제목>"
-git push origin lessons/from-my-project
+git commit -m "contrib(from-my-project): add LESSON-NNN <제목>"
+git push origin contrib/from-my-project
 # → GitHub에서 PR 오픈
 ```
 

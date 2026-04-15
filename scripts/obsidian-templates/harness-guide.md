@@ -449,16 +449,34 @@ git checkout harness/main -- docs/backend/api-conventions.md
 
 ---
 
-### 4단계 — 개선사항을 harness-template에 피드백
+### 4단계 — 개선사항을 harness-template에 자동 PR
 
+작업 중 발견한 마찰/개선점은 `HARNESS_FEEDBACK.md`에 즉시 기록합니다.  
+각 SPEC 사이클 종료 시 **Evaluator**가 아래 스크립트를 실행해 자동으로 PR을 생성합니다:
+
+```bash
+# 기여 내용 확인 (PR 생성 안 함)
+bash scripts/contribute-to-harness.sh --dry-run
+
+# PR 생성
+bash scripts/contribute-to-harness.sh
 ```
-프로젝트 작업 중 마찰 발견
-    → HARNESS_FEEDBACK.md에 즉시 기록
-    → 프로젝트 마무리 시 harness-template에 PR
+
+스크립트가 자동으로 처리하는 것:
+1. harness-template을 임시 클론
+2. `HARNESS_FEEDBACK.md` + `docs/lessons/LESSON-NNN-*.md` 복사
+3. `contrib/from-<project>-<date>` 브랜치로 push
+4. `gh` CLI로 PR 생성
+
+피드백 루프:
+```
+마찰 발견 → HARNESS_FEEDBACK.md 기록
+    → SPEC 사이클 종료 시 Evaluator가 스크립트 실행 → PR 자동 생성
+    → harness-template 메인테이너가 반영
     → 다음 프로젝트는 개선된 harness로 시작
 ```
 
-자세한 PR 절차 → [[reference/upstream-workflow|upstream-workflow]]
+자세한 내용 → [[reference/upstream-workflow|upstream-workflow]]
 
 ---
 

@@ -142,6 +142,30 @@ Commit: `docs: update HARNESS_FEEDBACK (SPEC-NNN)`
 
 > This step is not optional — it is the only feedback channel for improving the harness itself.
 
+### Harness Contribution (자동 PR)
+
+HARNESS_FEEDBACK.md 업데이트 후, 기여할 항목이 있으면 harness-template에 PR을 자동 생성합니다:
+
+```bash
+# 기여 내용 확인 (실제 PR 생성 안 함)
+bash scripts/contribute-to-harness.sh --dry-run
+
+# PR 생성
+bash scripts/contribute-to-harness.sh
+```
+
+사전 조건 (최초 1회):
+```bash
+git remote add harness <harness-template-url>
+gh auth login
+```
+
+대상 파일:
+- `HARNESS_FEEDBACK.md` — 체크박스 항목이 있을 때만 포함
+- `docs/lessons/LESSON-NNN-*.md` — 존재하는 경우 자동 포함
+
+> 스크립트가 없거나 remote가 미설정이면 스킵해도 무방 — 수동 PR은 `docs/git/upstream-workflow.md` 참조
+
 ---
 
 ## End of Session: Update CLAUDE.md Status
