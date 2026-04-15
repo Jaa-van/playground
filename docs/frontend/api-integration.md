@@ -1,8 +1,8 @@
-# API 연동 패턴
+# API Integration Patterns
 
-## axios 인스턴스 설정
+## axios Instance Setup
 
-모든 API 호출은 `services/api.js`의 axios 인스턴스를 통해야 합니다. `fetch` 직접 사용 금지.
+All API calls must go through the axios instance in `services/api.js`. Direct use of `fetch` is prohibited.
 
 ```js
 // src/services/api.js
@@ -17,7 +17,7 @@ const api = axios.create({
   },
 })
 
-// 요청 인터셉터: JWT 토큰 자동 첨부
+// request interceptor: auto-attach JWT token
 api.interceptors.request.use((config) => {
   const token = useAuthStore.getState().token
   if (token) {
@@ -26,12 +26,12 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// 응답 인터셉터: 공통 에러 처리
+// response interceptor: common error handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // 토큰 만료 → 로그아웃
+      // token expired → logout
       useAuthStore.getState().logout()
       window.location.href = '/login'
     }
@@ -42,7 +42,7 @@ api.interceptors.response.use(
 export default api
 ```
 
-## API 함수 파일 (도메인별 분리)
+## API Function Files (split by domain)
 
 ```js
 // src/services/userService.js
@@ -57,7 +57,7 @@ export const userService = {
 }
 ```
 
-## 커스텀 훅에서 사용
+## Usage in Custom Hooks
 
 ```js
 // src/hooks/useCreateUser.js
@@ -75,7 +75,7 @@ export function useCreateUser() {
       const { data: newUser } = await userService.create(data)
       return newUser
     } catch (err) {
-      const message = err.response?.data?.detail || '오류가 발생했습니다'
+      const message = err.response?.data?.detail || 'An error occurred'
       setError(message)
       throw err
     } finally {
@@ -87,35 +87,35 @@ export function useCreateUser() {
 }
 ```
 
-## 에러 메시지 추출
+## Error Message Extraction
 
-FastAPI 에러 형식에 맞게 메시지를 추출합니다:
+Extract messages matching FastAPI's error format:
 
 ```js
 // src/utils/apiError.js
 export function getErrorMessage(error) {
   const detail = error.response?.data?.detail
 
-  // 단일 문자열 에러
+  // single string error
   if (typeof detail === 'string') return detail
 
-  // Pydantic 유효성 검사 에러 (배열)
+  // Pydantic validation error (array)
   if (Array.isArray(detail)) {
     return detail.map(e => e.msg).join(', ')
   }
 
-  return '알 수 없는 오류가 발생했습니다'
+  return 'An unknown error occurred'
 }
 ```
 
-## 환경변수
+## Environment Variables
 
 ```
 # .env.development
 VITE_API_URL=http://localhost:8000/api/v1
 
-# .env.production (또는 docker 환경)
-VITE_API_URL=/api/v1   ← nginx 프록시 경유
+# .env.production (or Docker environment)
+VITE_API_URL=/api/v1   ← via nginx proxy
 ```
 
-Vite에서 환경변수는 `VITE_` 접두사 필수. `process.env` 사용 금지 → `import.meta.env` 사용.
+In Vite, env vars require the `VITE_` prefix. Do not use `process.env` → use `import.meta.env`.

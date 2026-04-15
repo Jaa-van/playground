@@ -1,105 +1,105 @@
-# Git 브랜치 전략
+# Git Branching Strategy
 
-## 브랜치 모델
+## Branch Model
 
 ```
-main          ← 운영 배포 기준. 직접 커밋 금지. 보호 브랜치.
-develop       ← 통합 브랜치. 항상 실행 가능한 상태 유지.
+main          ← production baseline. no direct commits. protected branch.
+develop       ← integration branch. always in a runnable state.
   ├── feature/SPEC-001-user-auth
   ├── feature/SPEC-002-product-crud
   ├── fix/login-token-expiry
   └── docs/update-api-conventions
 ```
 
-## 브랜치 네이밍
+## Branch Naming
 
-| 유형 | 형식 | 예시 |
-|------|------|------|
-| 기능 개발 | `feature/SPEC-NNN-<kebab-name>` | `feature/SPEC-001-user-auth` |
-| 버그 수정 | `fix/<kebab-description>` | `fix/login-token-expiry` |
-| 문서 업데이트 | `docs/<kebab-description>` | `docs/update-api-conventions` |
-| 핫픽스 | `hotfix/v<version>-<description>` | `hotfix/v1.0.1-null-pointer` |
-| 릴리즈 | `release/v<major>.<minor>` | `release/v1.0` |
+| Type | Format | Example |
+|------|--------|---------|
+| Feature development | `feature/SPEC-NNN-<kebab-name>` | `feature/SPEC-001-user-auth` |
+| Bug fix | `fix/<kebab-description>` | `fix/login-token-expiry` |
+| Documentation | `docs/<kebab-description>` | `docs/update-api-conventions` |
+| Hotfix | `hotfix/v<version>-<description>` | `hotfix/v1.0.1-null-pointer` |
+| Release | `release/v<major>.<minor>` | `release/v1.0` |
 
-## 머지 규칙
+## Merge Rules
 
-| From | To | 방법 | 조건 |
-|------|-----|------|------|
-| `feature/*` | `develop` | Squash merge | PR 필수, 평가자 APPROVE |
-| `fix/*` | `develop` | Squash merge | PR 필수 |
-| `docs/*` | `develop` | Squash merge | PR 선택 (단순 문서는 직접 가능) |
-| `develop` | `main` | Merge commit | 배포 전 QA 완료 |
-| `hotfix/*` | `main` + `develop` | Merge commit | 긴급 수정 시만 |
+| From | To | Method | Condition |
+|------|----|--------|-----------|
+| `feature/*` | `develop` | Squash merge | PR required, Evaluator APPROVE |
+| `fix/*` | `develop` | Squash merge | PR required |
+| `docs/*` | `develop` | Squash merge | PR optional (simple docs can go direct) |
+| `develop` | `main` | Merge commit | QA complete before deploy |
+| `hotfix/*` | `main` + `develop` | Merge commit | Emergency fixes only |
 
-**Squash merge를 사용하는 이유**: feature 브랜치의 WIP 커밋들을 하나로 합쳐 `develop` 히스토리를 깔끔하게 유지.
+**Why squash merge**: collapses WIP commits from feature branches into one, keeping `develop` history clean.
 
-## 브랜치 작업 흐름
+## Branch Workflows
 
-### 기능 개발 (일반 케이스)
+### Feature development (normal case)
 
 ```bash
-# develop 최신화
+# update develop
 git checkout develop
 git pull origin develop
 
-# feature 브랜치 생성
+# create feature branch
 git checkout -b feature/SPEC-001-user-auth
 
-# 작업 후 커밋
+# commit after work
 git add backend/app/api/v1/endpoints/users.py
 git commit -m "feat(backend): implement user registration endpoint"
 
-# develop 최신화 후 rebase (머지 전 필수)
+# rebase onto latest develop before PR (required)
 git fetch origin
 git rebase origin/develop
 
-# PR 생성
+# create PR
 gh pr create --base develop --title "feat(auth): SPEC-001 user auth [REVIEW]"
 ```
 
-### 버그 수정
+### Bug fix
 
 ```bash
 git checkout -b fix/login-token-expiry develop
-# 수정 후
+# after fix
 git commit -m "fix(auth): correct JWT token expiry calculation"
 gh pr create --base develop --title "fix(auth): correct JWT token expiry"
 ```
 
-### 핫픽스 (운영 긴급 수정)
+### Hotfix (production emergency)
 
 ```bash
 git checkout -b hotfix/v1.0.1-null-pointer main
-# 수정 후
+# after fix
 git commit -m "fix(users): handle null pointer on empty profile"
 
-# main과 develop 양쪽 머지
+# merge to both main and develop
 gh pr create --base main --title "hotfix: null pointer in user profile"
-# main 머지 후
+# after merging to main
 git checkout develop
 git merge --no-ff hotfix/v1.0.1-null-pointer
 git push origin develop
 ```
 
-## GitHub 브랜치 보호 설정
+## GitHub Branch Protection Settings
 
-`main` 브랜치에 적용:
+Apply to `main`:
 - Require pull request before merging: ✅
 - Require approvals: 1
 - Dismiss stale pull request approvals: ✅
-- Require status checks to pass: ✅ (CI 통과)
+- Require status checks to pass: ✅ (CI must pass)
 - Include administrators: ✅
 
-`develop` 브랜치에 적용:
-- Require pull request before merging: ✅ (혼자 작업 시 선택)
+Apply to `develop`:
+- Require pull request before merging: ✅ (optional for solo work)
 
-## 브랜치 정리
+## Branch Cleanup
 
-머지된 브랜치는 즉시 삭제:
+Delete merged branches immediately:
 
 ```bash
-# PR 머지 후 자동 삭제 (GitHub 설정에서 활성화 권장)
-# 수동 삭제
+# auto-delete after PR merge (enable in GitHub settings — recommended)
+# manual delete
 git branch -d feature/SPEC-001-user-auth
 git push origin --delete feature/SPEC-001-user-auth
 ```

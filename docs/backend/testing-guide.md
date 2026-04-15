@@ -1,17 +1,17 @@
-# Backend 테스트 가이드
+# Backend Testing Guide
 
-## 테스트 구조
+## Test Structure
 
 ```
 backend/tests/
-├── conftest.py          ← 공통 픽스처 (DB 세션, 테스트 클라이언트)
+├── conftest.py          ← shared fixtures (DB session, test client)
 ├── unit/
 │   └── test_user_service.py
 └── integration/
     └── test_user_endpoints.py
 ```
 
-## 공통 픽스처 (`tests/conftest.py`)
+## Shared Fixtures (`tests/conftest.py`)
 
 ```python
 import pytest
@@ -21,7 +21,7 @@ from sqlalchemy.orm import sessionmaker
 from app.main import app
 from app.core.database import Base, get_db
 
-# 테스트용 인메모리 SQLite DB (파일 미생성, 테스트 간 완전 격리)
+# In-memory SQLite for tests (no file created, fully isolated between tests)
 SQLALCHEMY_TEST_URL = "sqlite:///:memory:"
 
 engine = create_engine(SQLALCHEMY_TEST_URL, connect_args={"check_same_thread": False})
@@ -47,7 +47,7 @@ def client(db):
     app.dependency_overrides.clear()
 ```
 
-## 통합 테스트 예시
+## Integration Test Examples
 
 ```python
 # tests/integration/test_user_endpoints.py
@@ -56,15 +56,15 @@ def test_create_user_success(client):
     response = client.post("/api/v1/users", json={
         "email": "test@example.com",
         "password": "password123",
-        "name": "홍길동"
+        "name": "John Doe"
     })
     assert response.status_code == 201
     data = response.json()
     assert data["email"] == "test@example.com"
-    assert "password" not in data  # 비밀번호 응답에 포함 금지
+    assert "password" not in data  # password must not appear in response
 
 def test_create_user_duplicate_email(client):
-    payload = {"email": "dup@example.com", "password": "pw12345678", "name": "중복"}
+    payload = {"email": "dup@example.com", "password": "pw12345678", "name": "Duplicate"}
     client.post("/api/v1/users", json=payload)
 
     response = client.post("/api/v1/users", json=payload)
@@ -75,7 +75,7 @@ def test_get_user_not_found(client):
     assert response.status_code == 404
 ```
 
-## 단위 테스트 예시
+## Unit Test Examples
 
 ```python
 # tests/unit/test_user_service.py
@@ -86,46 +86,46 @@ import pytest
 
 def test_create_user_raises_on_duplicate():
     mock_repo = MagicMock()
-    mock_repo.find_by_email.return_value = MagicMock()  # 이미 존재하는 사용자
+    mock_repo.find_by_email.return_value = MagicMock()  # user already exists
 
     service = UserService(repo=mock_repo)
 
-    with pytest.raises(ValueError, match="이미 존재하는"):
+    with pytest.raises(ValueError, match="already exists"):
         service.create_user(UserCreate(
             email="test@example.com",
             password="password123",
-            name="홍길동"
+            name="John Doe"
         ))
 ```
 
-## 테스트 실행
+## Running Tests
 
 ```bash
-# Docker 내부에서 실행
+# run inside Docker
 docker compose exec backend pytest
 
-# 커버리지 포함
+# with coverage
 docker compose exec backend pytest --cov=app --cov-report=term-missing
 
-# 특정 파일만
+# specific file only
 docker compose exec backend pytest tests/integration/test_user_endpoints.py -v
 
-# 로컬에서 직접 (venv 활성화 후)
+# run locally (after activating venv)
 pytest tests/ -v
 ```
 
-## 커버리지 목표
+## Coverage Targets
 
-- 신규 작성 코드: **80% 이상**
-- Service 계층: **90% 이상** (비즈니스 로직이 집중된 곳)
-- Repository 계층: 통합 테스트로 커버
+- New code: **80%+**
+- Service layer: **90%+** (where business logic is concentrated)
+- Repository layer: covered by integration tests
 
-## 테스트 명명 규칙
+## Test Naming Convention
 
 ```
-test_<대상>_<상황>_<기대결과>
+test_<target>_<condition>_<expected_result>
 
-예시:
+Examples:
 test_create_user_success
 test_create_user_duplicate_email_raises_409
 test_get_user_not_found_returns_404

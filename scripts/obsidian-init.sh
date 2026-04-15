@@ -71,6 +71,14 @@ STATIC_FILES=(
     "specs/_index.md:specs/_index.md"
     "reviews/_index.md:reviews/_index.md"
     "feedback/_index.md:feedback/_index.md"
+    "devlog/_index.md:devlog/_index.md"
+    "devlog/_template.md:devlog/_template.md"
+    # Korean reference docs (human-readable, uploaded once — not overwritten by sync)
+    "reference/_index.md:reference/_index.md"
+    "reference/agents-planner.md:reference/agents-planner.md"
+    "reference/agents-developer.md:reference/agents-developer.md"
+    "reference/agents-evaluator.md:reference/agents-evaluator.md"
+    "reference/agents-handoff.md:reference/agents-handoff.md"
 )
 
 for entry in "${STATIC_FILES[@]}"; do
@@ -100,7 +108,15 @@ else
     fi
 fi
 
-# ── 3. docs/ 전체 동기화 (SPEC, REVIEW, FEEDBACK 등) ────────────────────
+# ── 3. 프로젝트 파일 업로드 (HARNESS_FEEDBACK) ───────────────────────────
+echo ""
+echo "📄 프로젝트 파일 업로드..."
+if [ -f "$REPO_ROOT/HARNESS_FEEDBACK.md" ]; then
+    put_file "$REPO_ROOT/HARNESS_FEEDBACK.md" "HARNESS_FEEDBACK.md"
+    printf "  ✓ HARNESS_FEEDBACK.md\n"
+fi
+
+# ── 4. docs/ 전체 동기화 (SPEC, REVIEW, FEEDBACK 등) ────────────────────
 echo ""
 echo "🔄 docs/ → Obsidian 동기화..."
 SYNC_SCRIPT="$REPO_ROOT/scripts/obsidian-sync.sh"

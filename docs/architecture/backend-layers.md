@@ -1,33 +1,33 @@
-# Backend 계층 구조
+# Backend Layer Architecture
 
-## 5계층 패턴
+## 5-Layer Pattern
 
-FastAPI 프로젝트는 다음 5개 계층으로 나뉩니다. 각 계층은 바로 아래 계층만 호출합니다.
+The FastAPI project is divided into 5 layers. Each layer only calls the layer directly below it.
 
 ```
-HTTP 요청
+HTTP request
     ↓
-[1] Router (api/v1/endpoints/)   ← HTTP 진입점, 인증 확인
+[1] Router (api/v1/endpoints/)   ← HTTP entry point, auth checks
     ↓
-[2] Schema (schemas/)            ← 입력 검증, 직렬화
+[2] Schema (schemas/)            ← input validation, serialization
     ↓
-[3] Service (services/)          ← 비즈니스 로직
+[3] Service (services/)          ← business logic
     ↓
-[4] Repository (repositories/)   ← DB 쿼리
+[4] Repository (repositories/)   ← DB queries
     ↓
 [5] Model (models/)              ← SQLAlchemy ORM
     ↓
-PostgreSQL
+SQLite
 ```
 
-## 각 계층 역할과 예시
+## Layer Roles and Examples
 
 ### [1] Router (`app/api/v1/endpoints/`)
 
-- HTTP 메서드, 경로 정의
-- 인증/권한 확인 (Depends)
-- Service 호출 후 Schema로 응답 반환
-- 비즈니스 로직 없음
+- Defines HTTP methods and paths
+- Handles auth/permission checks (Depends)
+- Calls Service and returns Schema response
+- No business logic
 
 ```python
 # app/api/v1/endpoints/users.py
@@ -47,9 +47,9 @@ async def create_user(
 
 ### [2] Schema (`app/schemas/`)
 
-- Pydantic BaseModel 기반
-- Request와 Response 스키마 분리
-- DB 모델과 1:1 매핑 금지 (노출하면 안 되는 필드 분리)
+- Pydantic BaseModel based
+- Request and Response schemas are separate
+- Do not map 1:1 to DB model (separate fields that should not be exposed)
 
 ```python
 # app/schemas/user.py
@@ -70,10 +70,10 @@ class UserResponse(BaseModel):
 
 ### [3] Service (`app/services/`)
 
-- 비즈니스 로직 전담
-- Repository 호출
-- 트랜잭션 관리
-- Router 계층의 HTTP 개념 없음 (HTTPException 사용 금지 → 전용 예외 클래스 사용)
+- Owns all business logic
+- Calls Repository
+- Manages transactions
+- No HTTP concepts from Router layer (no HTTPException — use custom exception classes)
 
 ```python
 # app/services/user_service.py
@@ -86,16 +86,16 @@ class UserService:
 
     async def create_user(self, data: UserCreate) -> UserResponse:
         if await self.repo.find_by_email(data.email):
-            raise ValueError("이미 존재하는 이메일입니다")
+            raise ValueError("Email already exists")
         user = await self.repo.create(data)
         return UserResponse.model_validate(user)
 ```
 
 ### [4] Repository (`app/repositories/`)
 
-- DB 쿼리만 담당
-- SQLAlchemy 세션 직접 사용
-- 비즈니스 로직 없음
+- DB queries only
+- Direct use of SQLAlchemy session
+- No business logic
 
 ```python
 # app/repositories/user_repository.py
@@ -120,9 +120,9 @@ class UserRepository:
 
 ### [5] Model (`app/models/`)
 
-- SQLAlchemy ORM 모델
-- 테이블 정의만
-- `Base`를 상속
+- SQLAlchemy ORM models
+- Table definitions only
+- Inherit from `Base`
 
 ```python
 # app/models/user.py
@@ -138,11 +138,11 @@ class User(Base):
     created_at = Column(DateTime, server_default=func.now())
 ```
 
-## 계층 위반 금지 사항
+## Layer Violation Prohibitions
 
-| 금지 | 이유 |
-|------|------|
-| Router에서 직접 DB 쿼리 | 테스트 불가, 재사용 불가 |
-| Service에서 HTTPException | Service는 HTTP 개념 없어야 함 |
-| Repository에 비즈니스 로직 | 단일 책임 원칙 위반 |
-| Schema에서 다른 Schema import 순환 참조 | Pydantic 오류 발생 |
+| Prohibited | Reason |
+|-----------|--------|
+| Direct DB query in Router | Not testable, not reusable |
+| HTTPException in Service | Service must have no HTTP concepts |
+| Business logic in Repository | Violates single responsibility |
+| Circular schema imports | Causes Pydantic errors |
