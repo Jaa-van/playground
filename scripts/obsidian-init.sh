@@ -11,6 +11,7 @@
 #
 # 필요 환경변수 (.env 또는 shell):
 #   OBSIDIAN_API_KEY, OBSIDIAN_HOST, OBSIDIAN_VAULT
+#   OBSIDIAN_VAULT를 비워두면 git repo 이름을 자동으로 사용합니다.
 
 set -e
 
@@ -25,8 +26,9 @@ if [ -f "$REPO_ROOT/.env" ]; then
     set +a
 fi
 
+REPO_NAME="$(basename "$REPO_ROOT")"
 HOST="${OBSIDIAN_HOST:-https://127.0.0.1:27124}"
-VAULT="${OBSIDIAN_VAULT:-harness-template}"
+VAULT="${OBSIDIAN_VAULT:-$REPO_NAME}"
 TOKEN="${OBSIDIAN_API_KEY:-}"
 
 # ── 유틸리티 ──────────────────────────────────────────────────────────────
