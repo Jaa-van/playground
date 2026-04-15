@@ -1,23 +1,23 @@
-# 상태 관리 가이드
+# State Management Guide
 
-## 상태 종류와 도구 선택
+## State Type Decision Tree
 
 ```
-어떤 상태인가?
+What kind of state is it?
 │
-├── 서버에서 오는 데이터 (API 응답)?
-│   └── 커스텀 훅 (useXxx) → hooks/ 디렉토리
+├── Data from the server (API response)?
+│   └── Custom hook (useXxx) → hooks/ directory
 │
-├── 한 컴포넌트 안에서만 쓰는 UI 상태?
+├── UI state used only within a single component?
 │   └── useState
 │
-└── 여러 컴포넌트가 공유하는 클라이언트 상태?
-    └── Zustand store → store/ 디렉토리
+└── Client state shared across multiple components?
+    └── Zustand store → store/ directory
 ```
 
-## 커스텀 훅 (서버 상태)
+## Custom Hook (server state)
 
-API 데이터는 항상 커스텀 훅으로 관리합니다.
+API data is always managed through a custom hook.
 
 ```js
 // hooks/useUsers.js
@@ -50,10 +50,10 @@ export function useUsers() {
 }
 ```
 
-## useState (로컬 UI 상태)
+## useState (local UI state)
 
 ```jsx
-// 모달 열림/닫힘 - 로컬 상태 적합
+// modal open/close — local state is appropriate
 function UserPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
@@ -67,9 +67,9 @@ function UserPage() {
 }
 ```
 
-## Zustand (전역 클라이언트 상태)
+## Zustand (global client state)
 
-로그인 사용자 정보, 토스트 알림 등 여러 컴포넌트에서 공유되는 상태.
+State shared across multiple components: logged-in user, toast notifications, etc.
 
 ```js
 // store/useAuthStore.js
@@ -84,27 +84,27 @@ export const useAuthStore = create(
       login: (user, token) => set({ user, token }),
       logout: () => set({ user: null, token: null }),
     }),
-    { name: 'auth-storage' }  // localStorage에 저장
+    { name: 'auth-storage' }  // persisted in localStorage
   )
 )
 ```
 
 ```jsx
-// 어디서든 사용 가능
+// usable anywhere
 import { useAuthStore } from '../store/useAuthStore'
 
 function Header() {
   const { user, logout } = useAuthStore()
-  return <header>{user ? <button onClick={logout}>로그아웃</button> : null}</header>
+  return <header>{user ? <button onClick={logout}>Logout</button> : null}</header>
 }
 ```
 
-## 판단 기준 요약
+## Decision Summary
 
-| 상황 | 도구 |
-|------|------|
-| 모달 열림/닫힘, 폼 입력값 | useState |
-| API 데이터 (목록, 단건 조회) | 커스텀 훅 |
-| 로그인 사용자 정보 | Zustand + persist |
-| 토스트/알림 메시지 | Zustand |
-| 페이지 간 공유 필터/정렬 상태 | Zustand |
+| Situation | Tool |
+|-----------|------|
+| Modal open/close, form input values | useState |
+| API data (list, single resource) | custom hook |
+| Logged-in user info | Zustand + persist |
+| Toast/notification messages | Zustand |
+| Shared filter/sort state across pages | Zustand |

@@ -1,6 +1,6 @@
-# API 명명 규칙
+# API Naming Conventions
 
-## URL 구조
+## URL Structure
 
 ```
 /api/v1/<resource>
@@ -8,35 +8,35 @@
 /api/v1/<resource>/{id}/<sub-resource>
 ```
 
-- 리소스명: **복수형 소문자** (`users`, `products`, `orders`)
-- 단어 구분: 하이픈 (`order-items`, not `orderItems`, not `order_items`)
-- 버전 접두사: `/api/v1/` 고정
+- Resource names: **plural lowercase** (`users`, `products`, `orders`)
+- Word separator: hyphen (`order-items`, not `orderItems`, not `order_items`)
+- Version prefix: `/api/v1/` fixed
 
-## HTTP 메서드 규칙
+## HTTP Method Rules
 
-| 작업 | 메서드 | URL 예시 | 응답 코드 |
-|------|--------|----------|-----------|
-| 목록 조회 | GET | `/api/v1/users` | 200 |
-| 단건 조회 | GET | `/api/v1/users/{id}` | 200 / 404 |
-| 생성 | POST | `/api/v1/users` | 201 |
-| 전체 수정 | PUT | `/api/v1/users/{id}` | 200 |
-| 부분 수정 | PATCH | `/api/v1/users/{id}` | 200 |
-| 삭제 | DELETE | `/api/v1/users/{id}` | 204 |
+| Action | Method | URL example | Response code |
+|--------|--------|-------------|---------------|
+| List | GET | `/api/v1/users` | 200 |
+| Get one | GET | `/api/v1/users/{id}` | 200 / 404 |
+| Create | POST | `/api/v1/users` | 201 |
+| Full update | PUT | `/api/v1/users/{id}` | 200 |
+| Partial update | PATCH | `/api/v1/users/{id}` | 200 |
+| Delete | DELETE | `/api/v1/users/{id}` | 204 |
 
-## 응답 형식
+## Response Format
 
-### 단건 응답
+### Single resource
 
 ```json
 {
   "id": 1,
-  "name": "홍길동",
-  "email": "hong@example.com",
+  "name": "John Doe",
+  "email": "john@example.com",
   "created_at": "2024-01-01T00:00:00Z"
 }
 ```
 
-### 목록 응답 (페이지네이션 포함)
+### List response (with pagination)
 
 ```json
 {
@@ -48,59 +48,59 @@
 }
 ```
 
-### 에러 응답
+### Error response
 
 ```json
 {
-  "detail": "사용자를 찾을 수 없습니다"
+  "detail": "User not found"
 }
 ```
 
-복수 에러 (유효성 검사 실패):
+Multiple errors (validation failure):
 
 ```json
 {
   "detail": [
-    {"loc": ["body", "email"], "msg": "유효한 이메일을 입력하세요", "type": "value_error"}
+    {"loc": ["body", "email"], "msg": "Enter a valid email", "type": "value_error"}
   ]
 }
 ```
 
-## HTTP 상태 코드
+## HTTP Status Codes
 
-| 코드 | 의미 | 사용 시점 |
-|------|------|-----------|
-| 200 | OK | 조회, 수정 성공 |
-| 201 | Created | 생성 성공 |
-| 204 | No Content | 삭제 성공 |
-| 400 | Bad Request | 잘못된 요청 형식 |
-| 401 | Unauthorized | 인증 토큰 없음/만료 |
-| 403 | Forbidden | 권한 없음 |
-| 404 | Not Found | 리소스 없음 |
-| 409 | Conflict | 중복 데이터 |
-| 422 | Unprocessable Entity | Pydantic 유효성 검사 실패 (FastAPI 자동) |
-| 500 | Internal Server Error | 서버 오류 |
+| Code | Meaning | When to use |
+|------|---------|-------------|
+| 200 | OK | GET, update success |
+| 201 | Created | Create success |
+| 204 | No Content | Delete success |
+| 400 | Bad Request | Malformed request |
+| 401 | Unauthorized | Missing/expired auth token |
+| 403 | Forbidden | Insufficient permissions |
+| 404 | Not Found | Resource does not exist |
+| 409 | Conflict | Duplicate data |
+| 422 | Unprocessable Entity | Pydantic validation failure (FastAPI automatic) |
+| 500 | Internal Server Error | Server error |
 
-## 필드 네이밍
+## Field Naming
 
-- JSON 필드: `snake_case` (`created_at`, `user_id`)
-- 날짜/시간: ISO 8601 형식 (`2024-01-01T00:00:00Z`)
-- ID: 정수 또는 UUID (프로젝트 내 통일)
+- JSON fields: `snake_case` (`created_at`, `user_id`)
+- Dates/times: ISO 8601 format (`2024-01-01T00:00:00Z`)
+- IDs: integer or UUID (consistent within the project)
 
-## 페이지네이션 쿼리 파라미터
+## Pagination Query Parameters
 
 ```
 GET /api/v1/users?page=1&size=20&sort=created_at&order=desc
 ```
 
-| 파라미터 | 기본값 | 설명 |
-|----------|--------|------|
-| page | 1 | 페이지 번호 (1부터 시작) |
-| size | 20 | 페이지당 항목 수 (최대 100) |
-| sort | created_at | 정렬 기준 필드 |
-| order | desc | 정렬 방향 (asc/desc) |
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| page | 1 | Page number (1-based) |
+| size | 20 | Items per page (max 100) |
+| sort | created_at | Sort field |
+| order | desc | Sort direction (asc/desc) |
 
-## FastAPI 라우터 파일 구조 예시
+## FastAPI Router File Structure
 
 ```python
 # app/api/v1/router.py

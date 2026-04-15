@@ -1,6 +1,6 @@
-# 시스템 아키텍처 개요
+# System Architecture Overview
 
-## 전체 구조
+## Overall Structure
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -27,16 +27,16 @@
 └──────────────────┘
 ```
 
-## 컴포넌트 역할
+## Component Roles
 
-| 컴포넌트 | 기술 | 역할 |
-|----------|------|------|
-| nginx | nginx:alpine | 리버스 프록시, `/api/*` → backend, `/` → frontend |
-| backend | Python 3.12 + FastAPI | REST API, 비즈니스 로직 |
+| Component | Technology | Role |
+|-----------|-----------|------|
+| nginx | nginx:alpine | Reverse proxy — `/api/*` → backend, `/` → frontend |
+| backend | Python 3.12 + FastAPI | REST API, business logic |
 | frontend | React 18 + Vite | SPA UI |
-| db | SQLite | 영속 데이터 저장 (`/app/data/app.db`, Docker 볼륨) |
+| db | SQLite | Persistent data storage (`/app/data/app.db`, Docker volume) |
 
-## 요청 흐름
+## Request Flow
 
 ```
 Browser → nginx:80
@@ -47,18 +47,18 @@ backend:8000
   └── FastAPI router → service layer → repository layer → SQLite:/app/data/app.db
 ```
 
-## 환경 구분
+## Environments
 
-| 환경 | docker-compose 파일 | 특징 |
-|------|---------------------|------|
-| 개발 (로컬) | `docker-compose.yml` + `docker-compose.override.yml` | hot reload, 볼륨 마운트 |
-| 운영 (EC2) | `docker-compose.yml` 단독 | 볼륨 마운트 없음 |
+| Environment | docker-compose file | Characteristics |
+|-------------|---------------------|-----------------|
+| Development (local) | `docker-compose.yml` + `docker-compose.override.yml` | hot reload, volume mount |
+| Production (EC2) | `docker-compose.yml` only | no volume mount |
 
-## 포트 정리
+## Ports
 
-| 서비스 | 내부 포트 | 외부 포트 (로컬) | 접근 방법 |
-|--------|-----------|------------------|-----------|
+| Service | Internal port | External port (local) | Access |
+|---------|--------------|----------------------|--------|
 | nginx | 80 | 80 | http://localhost |
-| backend | 8000 | 8000 | http://localhost:8000 (직접 접근 가능) |
-| frontend | 3000 | 3000 | http://localhost:3000 (직접 접근 가능) |
+| backend | 8000 | 8000 | http://localhost:8000 (direct) |
+| frontend | 3000 | 3000 | http://localhost:3000 (direct) |
 | Swagger UI | - | - | http://localhost:8000/docs |
