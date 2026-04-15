@@ -16,8 +16,15 @@ set -euo pipefail
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 PROJECT_NAME="$(basename "$REPO_ROOT")"
 DATE="$(date +%Y-%m-%d)"
-BRANCH_NAME="contrib/from-${PROJECT_NAME}-${DATE}"
 DRY_RUN=false
+
+# 소스 프로젝트의 harness 버전 읽기
+HARNESS_VERSION=""
+if [ -f "$REPO_ROOT/HARNESS_VERSION" ]; then
+    HARNESS_VERSION="$(tr -d '[:space:]' < "$REPO_ROOT/HARNESS_VERSION")"
+fi
+VERSION_SUFFIX="${HARNESS_VERSION:+-v${HARNESS_VERSION}}"
+BRANCH_NAME="contrib/from-${PROJECT_NAME}${VERSION_SUFFIX}-${DATE}"
 
 [ "${1:-}" = "--dry-run" ] && DRY_RUN=true
 
@@ -67,6 +74,7 @@ done
 echo ""
 echo "  브랜치: $BRANCH_NAME"
 echo "  대상:   $HARNESS_URL"
+[ -n "$HARNESS_VERSION" ] && echo "  버전:   v${HARNESS_VERSION}"
 echo ""
 
 if [ "$DRY_RUN" = true ]; then
@@ -116,7 +124,11 @@ done
 FEEDBACK_LINE=""
 [ "$FEEDBACK_HAS_ITEMS" = true ] && FEEDBACK_LINE=$'\n'"- \`HARNESS_FEEDBACK.md\`"
 
+VERSION_LINE=""
+[ -n "$HARNESS_VERSION" ] && VERSION_LINE=$'\n'"**기반 harness 버전**: \`v${HARNESS_VERSION}\`"
+
 PR_BODY="## From project: \`${PROJECT_NAME}\`
+${VERSION_LINE}
 
 ### 포함 파일
 ${FEEDBACK_LINE}${LESSON_LIST}

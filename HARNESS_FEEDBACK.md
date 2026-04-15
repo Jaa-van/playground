@@ -40,6 +40,6 @@
 ## 메타데이터
 
 - **프로젝트**: <!-- 이 프로젝트 이름 -->
-- **harness 버전**: <!-- git log --oneline -1 -- HARNESS_FEEDBACK.md (harness-template 기준) -->
+- **harness 버전**: <!-- cat HARNESS_VERSION (예: v1.0.0) -->
 - **기간**: <!-- YYYY-MM-DD ~ YYYY-MM-DD -->
 - **작성자**: <!-- Agent 역할 또는 사람 이름 -->

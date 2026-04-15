@@ -489,3 +489,49 @@ bash scripts/contribute-to-harness.sh
 | 3 | `bash scripts/setup-dev.sh` 실행 |
 | 4 | `CLAUDE.md` → Current Status 섹션 업데이트 |
 | 5 | Planner 세션 시작 → 첫 SPEC 작성 |
+
+---
+
+## 13. Harness 버저닝
+
+### 버전 파일
+
+```bash
+cat HARNESS_VERSION   # → 1.0.0
+```
+
+### 버전 번호 규칙
+
+| 변경 종류 | bump |
+|-----------|------|
+| 오타, 링크 수정, 설명 보완 | patch `1.0.x` |
+| 새 스크립트, 문서 섹션, 선택적 기능 추가 | minor `1.x.0` |
+| agent 워크플로우, 파일명 규칙, 디렉토리 구조 변경 | major `x.0.0` |
+
+### 릴리스 절차 (harness-template 메인테이너)
+
+```bash
+# 1. HARNESS_VERSION 수정
+# 2. CHANGELOG.md 항목 추가
+git commit -m "chore(release): vX.Y.Z"
+git tag vX.Y.Z
+git push origin main --tags
+```
+
+### 파생 프로젝트에서 특정 버전 동기화 / 롤백
+
+```bash
+git fetch harness --tags
+
+# 사용 가능한 버전 확인
+git tag -l --sort=-v:refname | grep "^v"
+
+# 특정 버전의 harness 레이어만 적용 (업그레이드 또는 롤백)
+git checkout harness/v1.0.0 -- docs/ scripts/ CLAUDE.md .env.example
+
+git commit -m "chore(harness): sync to v1.0.0"
+```
+
+> `backend/`, `frontend/`, `infrastructure/` 등 프로젝트 코드는 영향을 받지 않습니다.
+
+전체 버전 히스토리 → [[CHANGELOG]]
