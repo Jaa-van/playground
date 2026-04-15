@@ -220,12 +220,12 @@ regen_root_index() {
     local tmp
     tmp=$(mktemp /tmp/obs-XXXXXX.md)
 
-    # CLAUDE.md에서 현재 상태 읽기
+    # CLAUDE.md에서 현재 상태 읽기 (영문 필드명 기준)
     local step next_action updated
-    step=$(grep "\*\*단계\*\*" "$REPO_ROOT/CLAUDE.md" 2>/dev/null \
-        | sed 's/.*\*\*단계\*\*: *//' | head -1 || true)
-    next_action=$(grep "\*\*다음 필요 액션\*\*" "$REPO_ROOT/CLAUDE.md" 2>/dev/null \
-        | sed 's/.*\*\*다음 필요 액션\*\*: *//' | head -1 || true)
+    step=$(grep "\*\*Stage\*\*" "$REPO_ROOT/CLAUDE.md" 2>/dev/null \
+        | sed 's/.*\*\*Stage\*\*: *//' | head -1 || true)
+    next_action=$(grep "\*\*Next action\*\*" "$REPO_ROOT/CLAUDE.md" 2>/dev/null \
+        | sed 's/.*\*\*Next action\*\*: *//' | head -1 || true)
     step="${step:-초기 설정 완료}"
     next_action="${next_action:-기획자 → SPEC-001 작성}"
     updated=$(date +%Y-%m-%d)
@@ -260,6 +260,9 @@ regen_root_index() {
         echo "- [[harness-template/feedback/_index|피드백 & 노트 →]]"
         echo "- [[harness-template/architecture/_index|아키텍처]]"
         echo "- [[harness-template/agents/_index|Agent 역할]]"
+        echo "- [[harness-template/inbox/_index|Inbox (기획 메모) →]]"
+        echo "- [[harness-template/devlog/_index|개발 로그 →]]"
+        echo "- [[harness-template/harness-guide|하네스 완전 설명서]]"
 
         printf "\n---\n"
         printf "*이 노트는 git post-commit hook이 자동으로 갱신합니다.*\n"
@@ -301,8 +304,9 @@ sync_file() {  # sync_file <docs/...> (repo root 기준 상대경로)
             printf "  ↑ %s\n" "$rel"
             regen_feedback_index
             ;;
-        CLAUDE.md)
-            regen_root_index  # 현재 상태 섹션만 갱신
+        HARNESS_FEEDBACK.md)
+            put_file "$abs" "HARNESS_FEEDBACK.md"
+            printf "  ↑ HARNESS_FEEDBACK.md\n"
             ;;
     esac
 }
@@ -310,6 +314,24 @@ sync_file() {  # sync_file <docs/...> (repo root 기준 상대경로)
 full_sync() {
     printf "🔄 전체 동기화 시작...\n"
 
+    if [ -f "$REPO_ROOT/HARNESS_FEEDBACK.md" ]; then
+        put_file "$REPO_ROOT/HARNESS_FEEDBACK.md" "HARNESS_FEEDBACK.md"
+        printf "  ↑ HARNESS_FEEDBACK.md\n"
+    fi
+
+    # ── 한글 참조 문서 (templates/reference → Obsidian reference/) ──────────
+    local templates_dir="$REPO_ROOT/scripts/obsidian-templates"
+    for f in "$templates_dir/reference"/*.md; do
+        [ -f "$f" ] || continue
+        put_file "$f" "reference/$(basename "$f")"
+        printf "  ↑ scripts/obsidian-templates/reference/%s\n" "$(basename "$f")"
+    done
+    if [ -f "$templates_dir/harness-guide.md" ]; then
+        put_file "$templates_dir/harness-guide.md" "harness-guide.md"
+        printf "  ↑ scripts/obsidian-templates/harness-guide.md\n"
+    fi
+
+    # ── project docs (SPEC, REVIEW, FEEDBACK) ────────────────────────────
     for f in "$REPO_ROOT/docs/specs"/SPEC-*.md; do
         [ -f "$f" ] || continue
         put_file "$f" "specs/$(basename "$f")"

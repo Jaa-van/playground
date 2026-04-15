@@ -26,6 +26,7 @@
 - [[harness-template/architecture/_index|아키텍처]]
 - [[harness-template/agents/_index|Agent 역할]]
 - [[harness-template/inbox/_index|Inbox (기획 메모) →]]
+- [[harness-template/devlog/_index|개발 로그 →]]
 - [[harness-template/harness-guide|하네스 완전 설명서]]
 
 ---
