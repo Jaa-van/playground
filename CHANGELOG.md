@@ -47,11 +47,12 @@ harness-template의 버전별 변경 내역입니다.
 
 릴리스 절차:
 ```bash
-# 1. HARNESS_VERSION 수정
-# 2. CHANGELOG.md 항목 추가
-# 3. 커밋
-git commit -m "chore(release): v1.1.0"
-# 4. 태그
-git tag v1.1.0
-git push origin main --tags
+bash scripts/release.sh          # git log 분석 → 자동 판단
+bash scripts/release.sh minor    # 명시적 override
 ```
+
+`release.sh`가 자동으로 처리:
+1. 마지막 태그 이후 커밋 분석 → patch/minor/major 판단
+2. 사용자 확인
+3. HARNESS_VERSION 수정 + CHANGELOG 항목 생성
+4. 커밋 + 태그 + push
