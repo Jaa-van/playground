@@ -390,3 +390,148 @@ docker compose up --build
 | 환경 초기화 + Obsidian vault | `bash scripts/setup-dev.sh` | ✅ |
 | Claude MCP 설정 | `~/.claude/settings.json` 편집 | ❌ |
 | 앱 실행 | `docker compose up --build` | ✅ |
+
+---
+
+## 12. 멀티 레포 운용 전략
+
+> harness-template 하나에서 여러 독립 프로젝트를 파생시키는 방법입니다.
+
+### 구조
+
+```
+harness-template (GitHub Template Repo)
+    ↓ "Use this template"
+project-alpha/     ← 독립 repo
+project-beta/      ← 독립 repo
+project-gamma/     ← 독립 repo
+```
+
+각 프로젝트는 **독립 repo**입니다. fork가 아니므로 히스토리가 분리되고, 프로젝트 코드가 서로 영향을 주지 않습니다.
+
+---
+
+### 1단계 — harness-template을 GitHub Template Repository로 설정
+
+GitHub 레포 설정에서 **"Template repository"** 체크박스를 활성화합니다.  
+이후 새 프로젝트는 `Use this template` 버튼으로 생성합니다.
+
+---
+
+### 2단계 — 새 프로젝트에서 harness를 upstream으로 등록
+
+```bash
+git remote add harness https://github.com/your-username/harness-template.git
+
+# 확인
+git remote -v
+# origin   https://github.com/your-username/my-project.git
+# harness  https://github.com/your-username/harness-template.git
+```
+
+---
+
+### 3단계 — harness 업데이트 동기화 (선택적)
+
+harness-template에 개선이 반영된 경우, **전체 merge 없이 파일 단위로** 가져옵니다:
+
+```bash
+git fetch harness main
+
+# 변경 내용 확인
+git diff HEAD harness/main -- docs/ CLAUDE.md
+
+# 필요한 파일만 선택적으로 적용
+git checkout harness/main -- docs/backend/api-conventions.md
+```
+
+> 전체 merge는 하지 않습니다 — 프로젝트 코드와 충돌합니다.
+
+---
+
+### 4단계 — 개선사항을 harness-template에 자동 PR
+
+작업 중 발견한 마찰/개선점은 `HARNESS_FEEDBACK.md`에 즉시 기록합니다.  
+각 SPEC 사이클 종료 시 **Evaluator**가 아래 스크립트를 실행해 자동으로 PR을 생성합니다:
+
+```bash
+# 기여 내용 확인 (PR 생성 안 함)
+bash scripts/contribute-to-harness.sh --dry-run
+
+# PR 생성
+bash scripts/contribute-to-harness.sh
+```
+
+스크립트가 자동으로 처리하는 것:
+1. harness-template을 임시 클론
+2. `HARNESS_FEEDBACK.md` + `docs/lessons/LESSON-NNN-*.md` 복사
+3. `contrib/from-<project>-<date>` 브랜치로 push
+4. `gh` CLI로 PR 생성
+
+피드백 루프:
+```
+마찰 발견 → HARNESS_FEEDBACK.md 기록
+    → SPEC 사이클 종료 시 Evaluator가 스크립트 실행 → PR 자동 생성
+    → harness-template 메인테이너가 반영
+    → 다음 프로젝트는 개선된 harness로 시작
+```
+
+자세한 내용 → [[reference/upstream-workflow|upstream-workflow]]
+
+---
+
+### 새 프로젝트 시작 체크리스트
+
+| 순서 | 작업 |
+|------|------|
+| 1 | GitHub `Use this template` → 새 repo 생성 |
+| 2 | 로컬 clone 후 `git remote add harness <url>` 등록 |
+| 3 | `bash scripts/setup-dev.sh` 실행 |
+| 4 | `CLAUDE.md` → Current Status 섹션 업데이트 |
+| 5 | Planner 세션 시작 → 첫 SPEC 작성 |
+
+---
+
+## 13. Harness 버저닝
+
+### 버전 파일
+
+```bash
+cat HARNESS_VERSION   # → 1.0.0
+```
+
+### 버전 번호 규칙
+
+| 변경 종류 | bump |
+|-----------|------|
+| 오타, 링크 수정, 설명 보완 | patch `1.0.x` |
+| 새 스크립트, 문서 섹션, 선택적 기능 추가 | minor `1.x.0` |
+| agent 워크플로우, 파일명 규칙, 디렉토리 구조 변경 | major `x.0.0` |
+
+### 릴리스 절차 (harness-template 메인테이너)
+
+```bash
+# 1. HARNESS_VERSION 수정
+# 2. CHANGELOG.md 항목 추가
+git commit -m "chore(release): vX.Y.Z"
+git tag vX.Y.Z
+git push origin main --tags
+```
+
+### 파생 프로젝트에서 특정 버전 동기화 / 롤백
+
+```bash
+git fetch harness --tags
+
+# 사용 가능한 버전 확인
+git tag -l --sort=-v:refname | grep "^v"
+
+# 특정 버전의 harness 레이어만 적용 (업그레이드 또는 롤백)
+git checkout harness/v1.0.0 -- docs/ scripts/ CLAUDE.md .env.example
+
+git commit -m "chore(harness): sync to v1.0.0"
+```
+
+> `backend/`, `frontend/`, `infrastructure/` 등 프로젝트 코드는 영향을 받지 않습니다.
+
+전체 버전 히스토리 → [[CHANGELOG]]

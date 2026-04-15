@@ -141,4 +141,4 @@ docs(feedback): add DEVNOTES-NNN <feature name>
 - Error path: bad input, unauthorized, resource not found
 - Coverage target: 80%+ for newly written code
 
-→ Details: [docs/backend/testing-guide.md](../backend/testing-guide.md)
+→ Details: [testing-guide.md](../backend/testing-guide.md)
