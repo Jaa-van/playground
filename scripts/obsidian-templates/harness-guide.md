@@ -390,3 +390,84 @@ docker compose up --build
 | 환경 초기화 + Obsidian vault | `bash scripts/setup-dev.sh` | ✅ |
 | Claude MCP 설정 | `~/.claude/settings.json` 편집 | ❌ |
 | 앱 실행 | `docker compose up --build` | ✅ |
+
+---
+
+## 12. 멀티 레포 운용 전략
+
+> harness-template 하나에서 여러 독립 프로젝트를 파생시키는 방법입니다.
+
+### 구조
+
+```
+harness-template (GitHub Template Repo)
+    ↓ "Use this template"
+project-alpha/     ← 독립 repo
+project-beta/      ← 독립 repo
+project-gamma/     ← 독립 repo
+```
+
+각 프로젝트는 **독립 repo**입니다. fork가 아니므로 히스토리가 분리되고, 프로젝트 코드가 서로 영향을 주지 않습니다.
+
+---
+
+### 1단계 — harness-template을 GitHub Template Repository로 설정
+
+GitHub 레포 설정에서 **"Template repository"** 체크박스를 활성화합니다.  
+이후 새 프로젝트는 `Use this template` 버튼으로 생성합니다.
+
+---
+
+### 2단계 — 새 프로젝트에서 harness를 upstream으로 등록
+
+```bash
+git remote add harness https://github.com/your-username/harness-template.git
+
+# 확인
+git remote -v
+# origin   https://github.com/your-username/my-project.git
+# harness  https://github.com/your-username/harness-template.git
+```
+
+---
+
+### 3단계 — harness 업데이트 동기화 (선택적)
+
+harness-template에 개선이 반영된 경우, **전체 merge 없이 파일 단위로** 가져옵니다:
+
+```bash
+git fetch harness main
+
+# 변경 내용 확인
+git diff HEAD harness/main -- docs/ CLAUDE.md
+
+# 필요한 파일만 선택적으로 적용
+git checkout harness/main -- docs/backend/api-conventions.md
+```
+
+> 전체 merge는 하지 않습니다 — 프로젝트 코드와 충돌합니다.
+
+---
+
+### 4단계 — 개선사항을 harness-template에 피드백
+
+```
+프로젝트 작업 중 마찰 발견
+    → HARNESS_FEEDBACK.md에 즉시 기록
+    → 프로젝트 마무리 시 harness-template에 PR
+    → 다음 프로젝트는 개선된 harness로 시작
+```
+
+자세한 PR 절차 → [[reference/upstream-workflow|upstream-workflow]]
+
+---
+
+### 새 프로젝트 시작 체크리스트
+
+| 순서 | 작업 |
+|------|------|
+| 1 | GitHub `Use this template` → 새 repo 생성 |
+| 2 | 로컬 clone 후 `git remote add harness <url>` 등록 |
+| 3 | `bash scripts/setup-dev.sh` 실행 |
+| 4 | `CLAUDE.md` → Current Status 섹션 업데이트 |
+| 5 | Planner 세션 시작 → 첫 SPEC 작성 |
