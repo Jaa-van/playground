@@ -41,6 +41,13 @@ Record friction and improvement ideas immediately:
 
 > Evaluator must check HARNESS_FEEDBACK.md update status at the end of every SPEC cycle.
 
+## Security Rules
+
+- **Never hardcode** API keys, tokens, passwords, or any secrets in code or scripts
+- All secrets must be managed in `.env` and referenced as environment variables
+- `.env` is included in `.gitignore` — never commit it
+- Scripts that need secrets: `source .env` or reference via `${VAR_NAME}`
+
 ## Git Rules (summary)
 
 - No direct commits to `main` or `develop`
