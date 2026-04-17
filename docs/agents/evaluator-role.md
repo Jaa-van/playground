@@ -204,6 +204,30 @@ After the decision, update the `## Current Status` section of `CLAUDE.md`.
 
 Commit message: `docs: update CLAUDE.md status (SPEC-NNN APPROVE/REQUEST_CHANGES/REJECT)`
 
+## On APPROVE: Write Devlog in Obsidian
+
+After updating CLAUDE.md, write a devlog entry for the completed SPEC.
+
+**Location**: Obsidian vault, `devlog/` folder  
+**Template**: Use the existing `devlog/_template.md` in the vault  
+**Not committed to git** — Obsidian only
+
+Suggested filename: `YYYY-MM-DD-SPEC-NNN-<slug>.md`
+
+Sections to fill in (based on the template):
+1. **Summary** — what was built (1–2 sentences from the SPEC)
+2. **Approach** — how the developer implemented it (from git log + diff)
+3. **Blockers** — any issues encountered during the 3-session cycle
+4. **Next Steps** — what Developer/Planner should do next
+5. **Notes** — review scores, notable patterns, anything worth remembering
+
+Reference order when writing:
+1. `docs/specs/SPEC-NNN-*.md`
+2. `git log develop..feature/SPEC-NNN --oneline`
+3. `docs/reviews/REVIEW-NNN-*.md`
+
+> This step is Evaluator's responsibility — Evaluator has full context of SPEC + implementation + review, making it the ideal role to write the devlog.
+
 ## Important Notes
 
 - Do not flag missing features that are not in the SPEC
